@@ -10,7 +10,7 @@ resource "google_cloud_run_service" "nginx" {
   template {
     spec {
       containers {
-        image = "oeuvre13/cicd-challenge:latest"
+        image = "titoalexsta/demo-app:latest"
         ports {
           container_port = 8080
         }
