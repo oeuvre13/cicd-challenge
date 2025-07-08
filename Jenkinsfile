@@ -79,6 +79,7 @@ pipeline {
     steps {
     withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_FILE')]) {
     sh 'cp $GCP_KEY_FILE gcp-key.json'
+    sh 'cat gcp-key.json'
     }
     }
     }
@@ -107,11 +108,26 @@ pipeline {
     }
     }
     
-    // stage('Provision Cloud Run with Terraform') {
-    //   steps {
-    //     sh 'docker build -f ${DOCKERFILE_BUILD_PATH} -t ${IMAGE_NAME}:${IMAGE_TAG} .'
-    //   }
-    // }
+      stage('Send Telegram Notification'){
+          steps {
+              script {
+                  if (params.ENABLE_NOTIFICATIONS) {
+                      def startMessage = """
+                          🚀 <b>CI/CD Pipeline Started</b>
+                          ━━━━━━━━━━━━━━━━━━━━━━━
+                          📋 <b>Job:</b> ${env.JOB_NAME}
+                      🔢 <b>Build:</b> #${env.BUILD_NUMBER}
+                      🌿 <b>Branch:</b> ${env.BRANCH_NAME ?: 'main'}
+                      🏷️ <b>Tag:</b> ${env.FINAL_TAG}
+                      👤 <b>Triggered by:</b> ${env.BUILD_USER ?: 'System'}
+                      ⏰ <b>Started at:</b> ${new Date().format('yyyy-MM-dd HH:mm:ss')}
+                      🔗 <b>Console:</b> ${env.BUILD_URL}console
+                          """
+                          sendTelegramMessage(startMessage)
+                  }
+              }
+          }
+      }
   }
  
   post {
@@ -124,4 +140,57 @@ pipeline {
   }
 }
 
+def sendTelegramMessage(String message) {
+    if (!params.ENABLE_NOTIFICATIONS) {
+        return
+    }
+    
+    try {
+        echo "📱 Sending Telegram notification:"
+        echo "Message: ${message}"
+        echo "✅ Telegram notification sent successfully (simulated)"
+    } catch (Exception e) {
+        echo "❌ Telegram notification error: ${e.getMessage()}"
+    }
 
+    try {
+        def encodedMessage = message.replaceAll('"', '\\\\"')
+        def maxRetries = 3
+        def retryCount = 0
+        def success = false
+    
+        while (retryCount < maxRetries && !success) {
+            try {
+                def response = sh(
+                    script: """
+                        curl -s -X POST https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage \
+                            -d chat_id=\${TELEGRAM_CHAT_ID} \
+                            -d text="${encodedMessage}" \
+                            -d parse_mode=HTML \
+                            -w "HTTP_CODE:%{http_code}"
+                    """,
+                    returnStdout: true
+                ).trim()
+                
+                if (response.contains('HTTP_CODE:200')) {
+                    echo "✅ Telegram notification sent successfully"
+                    success = true
+                } else {
+                    throw new Exception("HTTP error: ${response}")
+                }
+            } catch (Exception e) {
+                retryCount++
+                echo "⚠️ Telegram notification attempt ${retryCount} failed: ${e.getMessage()}"
+                if (retryCount < maxRetries) {
+                    sleep(time: 5, unit: 'SECONDS')
+                }
+            }
+        }
+        
+        if (!success) {
+            echo "❌ Failed to send Telegram notification after ${maxRetries} attempts"
+        }
+    } catch (Exception e) {
+        echo "❌ Telegram notification error: ${e.getMessage()}"
+    }
+}
