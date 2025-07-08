@@ -9,8 +9,7 @@ pipeline {
     SONARQUBE_SERVER = 'SonarQube' 
     IMAGE_NAME = 'cicd-challenge'
     IMAGE_TAG = 'latest'
-    DOCKERFILE_BUILD_PATH = 'build/Dockerfile'
-    BUILD_CONTEXT = 'build'
+    DOCKERFILE_BUILD_PATH = 'dockerbuild/Dockerfile'
   }
  
   stages {
