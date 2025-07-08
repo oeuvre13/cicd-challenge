@@ -62,12 +62,12 @@ pipeline {
         }
     }
 
-  //   stage('Provision Cloud Run with Terraform') {
-  //     steps {
-  //       sh 'docker build -f ${DOCKERFILE_BUILD_PATH} -t ${IMAGE_NAME}:${IMAGE_TAG} .'
-  //     }
-  //   }
-  // }
+    // stage('Provision Cloud Run with Terraform') {
+    //   steps {
+    //     sh 'docker build -f ${DOCKERFILE_BUILD_PATH} -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+    //   }
+    // }
+  }
  
   post {
     success {
