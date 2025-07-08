@@ -11,6 +11,7 @@ pipeline {
     IMAGE_TAG = 'latest'
     DOCKERFILE_BUILD_PATH = 'dockerbuild/Dockerfile'
     DOCKERHUB_USER = 'oeuvre13'
+    TF_DIR = 'terraform'
   }
  
   stages {
@@ -71,7 +72,30 @@ pipeline {
         //     }
         // }
     }
+    stage('Terraform Init') {
+    steps {
+    dir("${TF_DIR}") {
+    sh 'terraform init -input=false'
+    }
+    }
+    }
 
+    stage('Terraform Plan') {
+    steps {
+    dir("${TF_DIR}") {
+    sh 'terraform plan -out=tfplan'
+    }
+    }
+    }
+
+    stage('Terraform Apply') {
+    steps {
+    dir("${TF_DIR}") {
+    sh 'terraform apply -input=false -auto-approve tfplan'
+    }
+    }
+    }
+    
     // stage('Provision Cloud Run with Terraform') {
     //   steps {
     //     sh 'docker build -f ${DOCKERFILE_BUILD_PATH} -t ${IMAGE_NAME}:${IMAGE_TAG} .'
