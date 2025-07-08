@@ -45,7 +45,7 @@ pipeline {
 
     stage('Build Docker Image') {
       steps {
-        sh 'docker build -f ${DOCKERFILE_BUILD_PATH} -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+        sh 'docker build -f ${DOCKERFILE_BUILD_PATH} -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} .'
       }
     }
 
