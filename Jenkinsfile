@@ -9,6 +9,8 @@ pipeline {
     SONARQUBE_SERVER = 'SonarQube' 
     IMAGE_NAME = 'cicd-challenge'
     IMAGE_TAG = 'latest'
+    DOCKERFILE_BUILD_PATH = 'build/Dockerfile'
+    BUILD_CONTEXT = 'build'
   }
  
   stages {
@@ -36,14 +38,14 @@ pipeline {
               -Dsonar.projectKey=cicd-challenge \
               -Dsonar.projectName='cicd-challenge' \
               -Dsonar.host.url=http://sonarqube:9000 \
-              -Dsonar.token=sqp_672c2c47e7624583caa799cd452cc82afbc85de9
+              -Dsonar.token=sqp_4ee12ac68f34739ce6ef24d45e5e409f34ad7f53
         """
       }
     }
 
     stage('Build Docker Image') {
       steps {
-        sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+        sh 'docker build -f ${DOCKERFILE_BUILD_PATH} -t ${IMAGE_NAME}:${IMAGE_TAG} .'
       }
     }
 
@@ -59,6 +61,12 @@ pipeline {
                 }
             }
         }
+    }
+
+    stage('Provision Cloud Run with Terraform') {
+      steps {
+        sh 'docker build -f ${DOCKERFILE_BUILD_PATH} -t ${IMAGE_NAME}:${IMAGE_TAG} .'
+      }
     }
   }
  
