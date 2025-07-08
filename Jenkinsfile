@@ -78,7 +78,7 @@ pipeline {
     stage('Setup GCP Auth') {
     steps {
     withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_FILE')]) {
-    sh 'cp $GCP_KEY_FILE gcp-key.json'
+    sh 'cp $GCP_KEY_FILE terraform/gcp-key.json'
     sh 'cat gcp-key.json'
     }
     }
