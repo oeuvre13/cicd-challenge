@@ -14,6 +14,8 @@ pipeline {
     TF_DIR = 'terraform'
     GOOGLE_APPLICATION_CREDENTIALS = 'gcp-key.json'
     GOOGLE_PROJECT = 'rakamin-ttc-odp-it-1'
+    TELEGRAM_BOT_TOKEN = '8029797501:AAHvAp4KV1KUabDAFN-Kalc58MDKm1sgQyc'
+    TELEGRAM_CHAT_ID = '2052628431'
   }
  
   stages {
