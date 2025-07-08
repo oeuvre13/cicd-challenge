@@ -12,6 +12,8 @@ pipeline {
     DOCKERFILE_BUILD_PATH = 'dockerbuild/Dockerfile'
     DOCKERHUB_USER = 'oeuvre13'
     TF_DIR = 'terraform'
+    GOOGLE_APPLICATION_CREDENTIALS = 'gcp-key.json'
+    GOOGLE_PROJECT = 'rakamin-ttc-odp-it-1'
   }
  
   stages {
@@ -72,6 +74,15 @@ pipeline {
         //     }
         // }
     }
+
+    stage('Setup GCP Auth') {
+    steps {
+    withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GCP_KEY_FILE')]) {
+    sh 'cp $GCP_KEY_FILE gcp-key.json'
+    }
+    }
+    }
+
     stage('Terraform Init') {
     steps {
     dir("${TF_DIR}") {
