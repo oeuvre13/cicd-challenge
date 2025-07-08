@@ -10,6 +10,7 @@ pipeline {
     IMAGE_NAME = 'cicd-challenge'
     IMAGE_TAG = 'latest'
     DOCKERFILE_BUILD_PATH = 'dockerbuild/Dockerfile'
+    DOCKERHUB_USER = 'oeuvre13'
   }
  
   stages {
@@ -56,7 +57,7 @@ pipeline {
             withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                 sh """
                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
                 """
             }
         }
