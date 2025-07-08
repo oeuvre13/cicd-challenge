@@ -53,13 +53,21 @@ pipeline {
         //     expression { return env.DOCKERHUB_USER && env.DOCKERHUB_TOKEN }
         // }
         steps {
-        script {
-            docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
-                    def image = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                    image.push()
-                }
-            }
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        sh """
+        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+        docker push ${IMAGE_NAME}:${IMAGE_TAG}
+        """
         }
+
+
+        // script {
+        //     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
+        //             def image = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+        //             image.push()
+        //         }
+        //     }
+        // }
     }
 
     // stage('Provision Cloud Run with Terraform') {
